@@ -19,6 +19,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import TensorDataset
 
 from model.entidades.erro_sistema import ErroSistema
+from model.redes.modelo_cnn_1d import ConfiguracaoCNN
 from model.redes.modelo_cnn_1d import ModeloCNN1D
 from services.constantes import CNN_DECAIMENTO_PESOS
 from services.constantes import CNN_MAXIMO_EPOCAS
@@ -56,6 +57,7 @@ CHAVE_QUANTIDADE_PARAMETROS = "quantidade_parametros"
 CHAVE_DISPOSITIVO = "dispositivo"
 CHAVE_MEMORIA_MAXIMA_MB = "memoria_maxima_mb"
 CHAVE_QUANTIDADE_PONTOS = "quantidade_pontos"
+CHAVE_CONFIGURACAO = "configuracao"
 
 
 class TreinadorCNN:
@@ -244,7 +246,7 @@ class TreinadorCNN:
         return perdaAcumulada / quantidadeMedicoes,vetorClassesReais,vetorClassesPreditas
 
     @staticmethod
-    def treinar(matrizDados:np.ndarray,vetorClasses:np.ndarray,indicesTreino:np.ndarray,indicesValidacao:np.ndarray,nomeRepresentacao:str="temporal",maximoEpocas:int=CNN_MAXIMO_EPOCAS,paciencia:int=CNN_PACIENCIA,usarCuda:bool=True,exibirProgresso:bool=True) -> dict[str,object] | None:
+    def treinar(matrizDados:np.ndarray,vetorClasses:np.ndarray,indicesTreino:np.ndarray,indicesValidacao:np.ndarray,nomeRepresentacao:str="temporal",maximoEpocas:int=CNN_MAXIMO_EPOCAS,paciencia:int=CNN_PACIENCIA,usarCuda:bool=True,exibirProgresso:bool=True,configuracao:ConfiguracaoCNN | None=None) -> dict[str,object] | None:
         TreinadorCNN.__limparUltimoErro()
 
         try:
@@ -268,7 +270,14 @@ class TreinadorCNN:
                 TreinadorCNN.__registrarErro(CODIGO_ERRO_DADOS_CNN_INVALIDOS,"Um parâmetro booleano é inválido","TreinadorCNN.treinar")
                 return None
 
+            elif(configuracao is not None and not isinstance(configuracao,ConfiguracaoCNN)):
+                TreinadorCNN.__registrarErro(CODIGO_ERRO_DADOS_CNN_INVALIDOS,"A configuração da CNN é inválida","TreinadorCNN.treinar")
+                return None
+
             else:
+                if(configuracao is None):
+                    configuracao = ConfiguracaoCNN.criarPadrao()
+
                 TreinadorCNN.__configurarReprodutibilidade()
 
                 if(usarCuda and torch.cuda.is_available()):
@@ -289,18 +298,18 @@ class TreinadorCNN:
                 classesTreino = np.ascontiguousarray(vetorClasses[indicesTreino],dtype=np.int64)
                 classesValidacao = np.ascontiguousarray(vetorClasses[indicesValidacao],dtype=np.int64)
 
-                tamanhoLoteTreino = min(CNN_TAMANHO_LOTE,indicesTreino.size)
-                tamanhoLoteValidacao = min(CNN_TAMANHO_LOTE,indicesValidacao.size)
+                tamanhoLoteTreino = min(configuracao.getTamanhoLote(),indicesTreino.size)
+                tamanhoLoteValidacao = min(configuracao.getTamanhoLote(),indicesValidacao.size)
                 usarMemoriaFixada = dispositivo.type == "cuda"
 
                 carregadorTreino = TreinadorCNN.__criarCarregador(matrizTreino,classesTreino,tamanhoLoteTreino,True,usarMemoriaFixada)
                 carregadorValidacao = TreinadorCNN.__criarCarregador(matrizValidacao,classesValidacao,tamanhoLoteValidacao,False,usarMemoriaFixada)
 
-                modelo = ModeloCNN1D()
+                modelo = ModeloCNN1D(configuracao)
                 modelo = modelo.to(dispositivo)
 
                 funcaoPerda = nn.CrossEntropyLoss()
-                otimizador = torch.optim.Adam(modelo.parameters(),lr=CNN_TAXA_APRENDIZADO,weight_decay=CNN_DECAIMENTO_PESOS)
+                otimizador = torch.optim.Adam(modelo.parameters(),lr=configuracao.getTaxaAprendizado(),weight_decay=configuracao.getDecaimentoPesos())
 
                 listaDeEpocas = []
                 listaDePerdasTreino = []
@@ -401,7 +410,8 @@ class TreinadorCNN:
                         CHAVE_QUANTIDADE_PARAMETROS: quantidadeParametros,
                         CHAVE_DISPOSITIVO: nomeDispositivo,
                         CHAVE_MEMORIA_MAXIMA_MB: float(memoriaMaximaMb),
-                        CHAVE_QUANTIDADE_PONTOS: matrizDados.shape[1]
+                        CHAVE_QUANTIDADE_PONTOS: matrizDados.shape[1],
+                        CHAVE_CONFIGURACAO: configuracao
                     }
 
         except Exception as excecao:
@@ -422,7 +432,7 @@ class TreinadorCNN:
                     CHAVE_MELHOR_EPOCA,CHAVE_PERDA_FINAL,CHAVE_ACURACIA_FINAL,
                     CHAVE_F1_FINAL,CHAVE_MATRIZ_CONFUSAO,CHAVE_TEMPO_TREINAMENTO,
                     CHAVE_QUANTIDADE_PARAMETROS,CHAVE_DISPOSITIVO,CHAVE_MEMORIA_MAXIMA_MB,
-                    CHAVE_QUANTIDADE_PONTOS
+                    CHAVE_QUANTIDADE_PONTOS,CHAVE_CONFIGURACAO
                 )
 
                 for chave in chavesObrigatorias:
@@ -455,6 +465,10 @@ class TreinadorCNN:
 
                 elif(not isinstance(resultado[CHAVE_MODELO],ModeloCNN1D)):
                     TreinadorCNN.__registrarErro(CODIGO_ERRO_RESULTADO_CNN_INVALIDO,"O modelo armazenado é inválido","TreinadorCNN.__validarResultado")
+                    return False
+
+                elif(not isinstance(resultado[CHAVE_CONFIGURACAO],ConfiguracaoCNN)):
+                    TreinadorCNN.__registrarErro(CODIGO_ERRO_RESULTADO_CNN_INVALIDO,"A configuração armazenada é inválida","TreinadorCNN.__validarResultado")
                     return False
 
                 else:
@@ -549,7 +563,8 @@ class TreinadorCNN:
                     "estado_modelo": resultado[CHAVE_MODELO].state_dict(),
                     "representacao": resultado[CHAVE_REPRESENTACAO],
                     "quantidade_classes": QUANTIDADE_AMBIENTES,
-                    "quantidade_pontos": int(resultado[CHAVE_QUANTIDADE_PONTOS])
+                    "quantidade_pontos": int(resultado[CHAVE_QUANTIDADE_PONTOS]),
+                    "configuracao": resultado[CHAVE_CONFIGURACAO].paraDicionario()
                 }
 
                 torch.save(pacoteModelo,caminhoModelo)

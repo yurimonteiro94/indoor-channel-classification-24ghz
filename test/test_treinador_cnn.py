@@ -5,8 +5,10 @@ from pathlib import Path
 
 import numpy as np
 
+from model.redes.modelo_cnn_1d import ConfiguracaoCNN
 from services.constantes import QUANTIDADE_AMBIENTES
 from services.treinador_cnn import CHAVE_ACURACIA_FINAL
+from services.treinador_cnn import CHAVE_CONFIGURACAO
 from services.treinador_cnn import CHAVE_DISPOSITIVO
 from services.treinador_cnn import CHAVE_EPOCAS
 from services.treinador_cnn import CHAVE_F1_FINAL
@@ -93,6 +95,23 @@ class TestTreinadorCNN(unittest.TestCase):
                 self.assertTrue(caminhoArquivo.exists())
                 self.assertTrue(caminhoArquivo.is_file())
                 self.assertGreater(caminhoArquivo.stat().st_size,0)
+
+    def test_treinarComConfiguracaoPersonalizada(self):
+        matrizDados,vetorClasses,indicesTreino,indicesValidacao = self.criarDados()
+
+        configuracao = ConfiguracaoCNN.criar(8,16,32,8,32,0.10,32,0.0005,0.00001)
+
+        self.assertIsNotNone(configuracao)
+
+        resultado = TreinadorCNN.treinar(matrizDados,vetorClasses,indicesTreino,indicesValidacao,"temporal",1,1,False,False,configuracao)
+
+        self.assertIsNotNone(resultado)
+        self.assertIs(resultado[CHAVE_CONFIGURACAO],configuracao)
+        self.assertEqual(resultado[CHAVE_CONFIGURACAO].getCanaisPrimeiraCamada(),8)
+        self.assertEqual(resultado[CHAVE_CONFIGURACAO].getCanaisSegundaCamada(),16)
+        self.assertEqual(resultado[CHAVE_CONFIGURACAO].getCanaisTerceiraCamada(),32)
+        self.assertEqual(resultado[CHAVE_CONFIGURACAO].getTamanhoLote(),32)
+        self.assertAlmostEqual(resultado[CHAVE_CONFIGURACAO].getTaxaAprendizado(),0.0005)
 
     def test_rejeitarIndicesSobrepostos(self):
         matrizDados,vetorClasses,indicesTreino,indicesValidacao = self.criarDados()
