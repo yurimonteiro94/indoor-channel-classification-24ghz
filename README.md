@@ -115,56 +115,18 @@ A arquitetura otimizada encontrada possui:
 
 ## Otimização dos hiperparâmetros
 
-A configuração da CNN é representada por um vetor de variáveis contínuas e discretizadas:
+A configuração da CNN é determinada por seis variáveis:
 
-\[
-\boldsymbol{x}
-=
-\begin{bmatrix}
-\log_{10}(\eta) &
-\log_{10}(\lambda) &
-d &
-i_f &
-i_h &
-i_b
-\end{bmatrix}^{T},
-\]
+- logaritmo decimal da taxa de aprendizado;
+- logaritmo decimal do decaimento dos pesos;
+- taxa de dropout;
+- índice que seleciona a quantidade de filtros;
+- índice que seleciona a quantidade de neurônios da camada densa;
+- índice que seleciona o tamanho do lote.
 
-em que:
+A função objetivo consiste em minimizar a perda de entropia cruzada no conjunto de validação. Para cada configuração candidata, a CNN é treinada com o conjunto de treinamento e avaliada no conjunto de validação.
 
-- \(\eta\) é a taxa de aprendizado;
-- \(\lambda\) é o decaimento dos pesos;
-- \(d\) é a taxa de dropout;
-- \(i_f\) seleciona a quantidade de filtros;
-- \(i_h\) seleciona a quantidade de neurônios da camada densa;
-- \(i_b\) seleciona o tamanho do lote.
-
-O problema é formulado como:
-
-\[
-\min_{\boldsymbol{x}}
-J(\boldsymbol{x})
-=
-\mathcal{L}_{\mathrm{val}}
-\left(
-\boldsymbol{\theta}^{*}(\boldsymbol{x})
-\right),
-\]
-
-com:
-
-\[
-\boldsymbol{\theta}^{*}(\boldsymbol{x})
-=
-\arg\min_{\boldsymbol{\theta}}
-\mathcal{L}_{\mathrm{treino}}
-\left(
-\boldsymbol{\theta};
-\boldsymbol{x}
-\right).
-\]
-
-A busca foi realizada por evolução diferencial, com seis variáveis e 36 avaliações da função objetivo.
+A busca foi realizada por evolução diferencial, com seis variáveis e 36 avaliações da função objetivo. As variáveis associadas à quantidade de filtros, à camada densa e ao tamanho do lote são convertidas em escolhas discretas por arredondamento.
 
 ## Resultados preliminares
 
