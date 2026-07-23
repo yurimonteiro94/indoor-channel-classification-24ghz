@@ -1,0 +1,13 @@
+subconjunto,classe,ambiente,quantidade_medicoes,quantidade_grupos
+treino,0,Corredor,1370,137
+treino,1,Laboratório,1370,137
+treino,2,Saguão principal,1370,137
+treino,3,Ginásio,1370,137
+validacao,0,Corredor,290,29
+validacao,1,Laboratório,290,29
+validacao,2,Saguão principal,290,29
+validacao,3,Ginásio,290,29
+teste,0,Corredor,300,30
+teste,1,Laboratório,300,30
+teste,2,Saguão principal,300,30
+teste,3,Ginásio,300,30

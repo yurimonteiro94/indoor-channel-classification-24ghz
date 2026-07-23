@@ -1,0 +1,15 @@
+metrica,valor
+quantidade_medicoes,7840
+quantidade_grupos,784
+quantidade_classes,4
+quantidade_pontos_frequencia,601
+frequencia_inicial_ghz,2.400000000
+frequencia_final_ghz,2.500000000
+medicoes_treino,5480
+medicoes_validacao,1160
+medicoes_teste,1200
+grupos_treino,548
+grupos_validacao,116
+grupos_teste,120
+variancia_pca_1,0.412915259600
+variancia_pca_2,0.347147822380
