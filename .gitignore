@@ -26,7 +26,6 @@ artigo/*.fls
 artigo/*.fdb_latexmk
 artigo/*.bbl
 artigo/*.blg
-h
 
 modelos/
 *.pt

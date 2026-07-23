@@ -322,3 +322,7 @@ As próximas etapas incluem:
 A base é distribuída pelo UCI Machine Learning Repository sob a licença Creative Commons Attribution 4.0 International.
 
 Este repositório não redistribui os arquivos brutos da base. Para reproduzir os experimentos, os dados devem ser obtidos diretamente da fonte original.
+
+## Licença do código
+
+O código-fonte deste repositório é disponibilizado sob a Licença MIT. Consulte o arquivo [LICENSE](LICENSE).
