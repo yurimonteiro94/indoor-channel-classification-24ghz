@@ -28,4 +28,5 @@ artigo/*.synctex.gz
 artigo/*.fls
 artigo/*.fdb_latexmk
 artigo/*.bbl
-artigo/*.blg
+artigo/*.blg*.pt
+*.pth

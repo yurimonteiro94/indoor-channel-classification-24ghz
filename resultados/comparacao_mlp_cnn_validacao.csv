@@ -1,0 +1,3 @@
+modelo,representacao,perda_validacao,acuracia_validacao,f1_macro_validacao,tempo_segundos,quantidade_parametros
+MLP,temporal,0.186859890819,0.936206896552,0.935534278709,1.540016,39092
+CNN 1D,temporal,0.129918885848,0.948275862069,0.948386508284,9.075486,75124

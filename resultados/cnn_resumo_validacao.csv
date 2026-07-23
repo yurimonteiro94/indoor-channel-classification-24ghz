@@ -1,0 +1,2 @@
+representacao,melhor_epoca,epocas_executadas,perda_validacao,acuracia_validacao,f1_macro_validacao,tempo_segundos,quantidade_parametros,dispositivo,memoria_maxima_mb
+temporal,15,22,0.129918885848,0.948275862069,0.948386508284,9.075486,75124,NVIDIA GeForce GTX 1650,69.854492
