@@ -1,0 +1,13 @@
+parametro,valor
+canais_primeira_camada,32
+canais_segunda_camada,64
+canais_terceira_camada,128
+tamanho_pooling_adaptativo,16
+neuronios_camada_densa,96
+dropout,0.05011212702041523
+tamanho_lote,32
+taxa_aprendizado,0.001865628873120754
+decaimento_pesos,0.0003372790112162736
+avaliacoes,36
+valor_objetivo_busca,0.038901053343
+tempo_total_segundos,366.514466

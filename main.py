@@ -9,6 +9,7 @@ COMANDO_PREPARAR_EXPERIMENTOS = "preparar-experimentos"
 COMANDO_GERAR_ANALISE = "gerar-analise"
 COMANDO_TREINAR_MLP = "treinar-mlp"
 COMANDO_TREINAR_CNN = "treinar-cnn"
+COMANDO_OTIMIZAR_CNN = "otimizar-cnn"
 COMANDO_EXECUTAR_PIPELINE = "executar-pipeline"
 COMANDO_TESTAR = "testar"
 
@@ -27,6 +28,7 @@ def exibirAjuda() -> None:
     print("gerar-analise          Gera a análise exploratória, tabelas e gráficos.")
     print("treinar-mlp            Treina e compara as redes MLP.")
     print("treinar-cnn            Treina a CNN 1D com a representação temporal.")
+    print("otimizar-cnn           Otimiza os hiperparâmetros da CNN 1D.")
     print("executar-pipeline      Executa todas as etapas em sequência.")
     print("testar                  Executa todos os testes automatizados.")
 
@@ -97,6 +99,17 @@ def treinarCNN() -> bool:
         return False
 
 
+def otimizarCNN() -> bool:
+    try:
+        from controller.otimizar_cnn import executar
+
+        return executar()
+
+    except Exception as excecao:
+        print("Não foi possível otimizar a CNN 1D: " + str(excecao))
+        return False
+
+
 def executarTestes() -> bool:
     try:
         listaDeComandos = [
@@ -125,39 +138,45 @@ def executarTestes() -> bool:
 
 
 def executarPipeline() -> bool:
-    print("Etapa 1 de 6: download da base.")
+    print("Etapa 1 de 7: download da base.")
 
     if(not baixarBase()):
         return False
 
     print()
-    print("Etapa 2 de 6: processamento da base.")
+    print("Etapa 2 de 7: processamento da base.")
 
     if(not processarBase()):
         return False
 
     print()
-    print("Etapa 3 de 6: preparação dos experimentos.")
+    print("Etapa 3 de 7: preparação dos experimentos.")
 
     if(not prepararExperimentos()):
         return False
 
     print()
-    print("Etapa 4 de 6: análise exploratória.")
+    print("Etapa 4 de 7: análise exploratória.")
 
     if(not gerarAnaliseExploratoria()):
         return False
 
     print()
-    print("Etapa 5 de 6: treinamento das redes MLP.")
+    print("Etapa 5 de 7: treinamento das redes MLP.")
 
     if(not treinarMLP()):
         return False
 
     print()
-    print("Etapa 6 de 6: treinamento da CNN 1D.")
+    print("Etapa 6 de 7: treinamento da CNN 1D.")
 
     if(not treinarCNN()):
+        return False
+
+    print()
+    print("Etapa 7 de 7: otimização da CNN 1D.")
+
+    if(not otimizarCNN()):
         return False
 
     print()
@@ -188,6 +207,9 @@ def executarComando(comando:str) -> bool:
 
     elif(comando == COMANDO_TREINAR_CNN):
         return treinarCNN()
+
+    elif(comando == COMANDO_OTIMIZAR_CNN):
+        return otimizarCNN()
 
     elif(comando == COMANDO_EXECUTAR_PIPELINE):
         return executarPipeline()
