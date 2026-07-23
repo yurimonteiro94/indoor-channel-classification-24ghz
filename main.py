@@ -7,6 +7,7 @@ COMANDO_BAIXAR_BASE = "baixar-base"
 COMANDO_PROCESSAR_BASE = "processar-base"
 COMANDO_PREPARAR_EXPERIMENTOS = "preparar-experimentos"
 COMANDO_GERAR_ANALISE = "gerar-analise"
+COMANDO_TREINAR_MLP = "treinar-mlp"
 COMANDO_EXECUTAR_PIPELINE = "executar-pipeline"
 COMANDO_TESTAR = "testar"
 
@@ -23,6 +24,7 @@ def exibirAjuda() -> None:
     print("processar-base         Processa os arquivos CSV da base original.")
     print("preparar-experimentos  Cria as divisões e representações normalizadas.")
     print("gerar-analise          Gera a análise exploratória, tabelas e gráficos.")
+    print("treinar-mlp            Treina e compara as redes MLP.")
     print("executar-pipeline      Executa todas as etapas em sequência.")
     print("testar                  Executa todos os testes automatizados.")
 
@@ -71,9 +73,30 @@ def gerarAnaliseExploratoria() -> bool:
         return False
 
 
+def treinarMLP() -> bool:
+    try:
+        from controller.treinar_mlp import executar
+
+        return executar()
+
+    except Exception as excecao:
+        print("Não foi possível treinar as redes MLP: " + str(excecao))
+        return False
+
+
 def executarTestes() -> bool:
     try:
-        listaDeComandos = [sys.executable,"-m","unittest","discover","-s","test","-p","test_*.py","-v"]
+        listaDeComandos = [
+            sys.executable,
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "test",
+            "-p",
+            "test_*.py",
+            "-v"
+        ]
 
         resultado = subprocess.run(listaDeComandos,check=False)
 
@@ -89,27 +112,33 @@ def executarTestes() -> bool:
 
 
 def executarPipeline() -> bool:
-    print("Etapa 1 de 4: download da base.")
+    print("Etapa 1 de 5: download da base.")
 
     if(not baixarBase()):
         return False
 
     print()
-    print("Etapa 2 de 4: processamento da base.")
+    print("Etapa 2 de 5: processamento da base.")
 
     if(not processarBase()):
         return False
 
     print()
-    print("Etapa 3 de 4: preparação dos experimentos.")
+    print("Etapa 3 de 5: preparação dos experimentos.")
 
     if(not prepararExperimentos()):
         return False
 
     print()
-    print("Etapa 4 de 4: análise exploratória.")
+    print("Etapa 4 de 5: análise exploratória.")
 
     if(not gerarAnaliseExploratoria()):
+        return False
+
+    print()
+    print("Etapa 5 de 5: treinamento das redes MLP.")
+
+    if(not treinarMLP()):
         return False
 
     print()
@@ -134,6 +163,9 @@ def executarComando(comando:str) -> bool:
 
     elif(comando == COMANDO_GERAR_ANALISE):
         return gerarAnaliseExploratoria()
+
+    elif(comando == COMANDO_TREINAR_MLP):
+        return treinarMLP()
 
     elif(comando == COMANDO_EXECUTAR_PIPELINE):
         return executarPipeline()

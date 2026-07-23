@@ -1,0 +1,4 @@
+representacao,melhor_epoca,epocas_executadas,perda_validacao,acuracia_validacao,f1_macro_validacao,tempo_segundos,quantidade_parametros
+cartesiana,9,16,0.255765438080,0.906034482759,0.905613419597,0.876707,39092
+polar,4,11,0.459202110767,0.872413793103,0.872410284934,0.594209,39092
+temporal,22,29,0.186859890819,0.936206896552,0.935534278709,1.540016,39092
